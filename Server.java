@@ -28,31 +28,41 @@ public class Server
 					processConnections();
 
 					System.out.println("waiting for input");
-					do
+					while(true)
 					{
 						message = input.next() + "\n";
 
 						System.out.println("Received message: " + message);
-						response = Integer.toString(message.length()) + "\n";
+						response = Integer.toString(message.length() - 1) + "\n";
 						System.out.println("Returning length: " + response);
 						
 						output.format(response);
 						output.flush();
 						System.out.println("Sent response" + "\n");
-					}while(!message.toUpperCase().equals("EXIT"));
+					}
 				}
 				catch(IOException ioe)
 				{
 					ioe.printStackTrace();
-					output.close();
-					input.close();
-					connection.close();
 				}
 			}
 		}
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				output.close();
+				input.close();
+				connection.close();
+			}
+			catch(IOException ioe)
+			{
+				ioe.printStackTrace();
+			}
 		}
 	}
 	public void processConnections() throws IOException

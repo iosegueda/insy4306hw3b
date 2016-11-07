@@ -20,7 +20,7 @@ public class Client
 			clientInput = new Scanner(System.in);
 			String message = "";
 
-			while(!message.toUpperCase().equals("EXIT"))
+			while(true)
 			{
 				System.out.println("Please enter a message");
 				message = clientInput.next() + "\n";
@@ -32,13 +32,23 @@ public class Client
 				System.out.println("Waiting for response");
 				System.out.println(input.next() + "\n");
 			}
-			output.close();
-			input.close();
-			connection.close();
 		}
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				output.close();
+				input.close();
+				connection.close();
+			}
+			catch(IOException ioe)
+			{
+				ioe.printStackTrace();
+			}
 		}
 	}
 }
