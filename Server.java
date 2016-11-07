@@ -1,58 +1,63 @@
 //Iris Osegueda
 import java.io.*;
-import java.net;
+import java.net.*;
 import java.util.*;
 
 public class Server
 {
 	private ServerSocket serverSocket;
 	private Socket connection = null;
-	private Scanner myInput = new Scanner(System.in);
+	private Scanner input = null;
 	private Formatter output = null;
-	private String stringMessage;
+	private String message = "";
 	
 	public void runServer()
-	
-	while(true) 
 	{
+		String response = "";
 		try
 		{
 			serverSocket = new ServerSocket(8000, 100);
-			
-			System.out.println("waiting for input"):
-			connection = serverSocket.accept();
-			
-			string = input.nextLine(); 
-			System.out.println("Received message: " + string);
-			output.flush();
-			
-			countMessage();
-			
-			input.close();
-			output.close();
-			connection.close();
+			while(true) 
+			{
+				try
+				{
+					System.out.println("waiting for connection");
+					connection = serverSocket.accept();
+
+					System.out.println("Client has connected");
+					processConnections();
+
+					System.out.println("waiting for input");
+					do
+					{
+						message = input.next() + "\n";
+
+						System.out.println("Received message: " + message);
+						response = Integer.toString(message.length()) + "\n";
+						System.out.println("Returning length: " + response);
+						
+						output.format(response);
+						output.flush();
+						System.out.println("Sent response" + "\n");
+					}while(!message.toUpperCase().equals("EXIT"));
+				}
+				catch(IOException ioe)
+				{
+					ioe.printStackTrace();
+					output.close();
+					input.close();
+					connection.close();
+				}
+			}
 		}
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
 	}
-}
-public void countMessage(String stringMessage)
-{
-	int wordCount = 0; 
-	int charCount = 0;
-	String allCounts = "";
-	
-	String[] words = line.split( "\\s" );
-                
-	wordCount += words.length;
-	
-	for( int i = 0; i < words.length; i++ )
-		charCount += words[ i ].length();
-	
-	allCounts = ( "nNumber of words: " + wordCount +
-					"\nNumber of characters:  " + charCount );
-	
-	System.out.println(allCounts);
+	public void processConnections() throws IOException
+	{
+		input = new Scanner(connection.getInputStream());
+		output = new Formatter(connection.getOutputStream());
+	}
 }

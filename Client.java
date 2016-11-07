@@ -5,34 +5,40 @@ import java.util.*;
 
 public class Client
 {
+	private static Socket connection = null;
+
 	public static void main(String args[])
 	{
-		private ServerSocket serverSocket;
-		private Socket connection = null;
-		private Scanner myInput = new Scanner(System.in);
-		private Formatter output = null;
-		private String stringMessage;
-		
-		while(true)
+		Scanner input = null;
+		Formatter output = null;
+		Scanner clientInput = null;
+		try
 		{
-			try
+			connection = new Socket("localhost", 8000);
+			input = new Scanner(connection.getInputStream());
+			output = new Formatter(connection.getOutputStream());
+			clientInput = new Scanner(System.in);
+			String message = "";
+
+			while(!message.toUpperCase().equals("EXIT"))
 			{
-				connection = new Socket("localhost", 8000);
-				input = new Scanner(connection.getInputStream());
-				output = new Formatter(connection.getOutputStream());
-				
 				System.out.println("Please enter a message");
-				stringMessage = myInput.nextLine();
-				
+				message = clientInput.next() + "\n";
+
+				System.out.println("Sending message: " + message);
+				output.format(message);
 				output.flush();
-				input.close();
-				output.close();
-				connection.close();
+
+				System.out.println("Waiting for response");
+				System.out.println(input.next() + "\n");
 			}
-			catch(IOException ioe)
-			{
-				ioe.printStackTrace();
-			}
+			output.close();
+			input.close();
+			connection.close();
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
 		}
 	}
 }
