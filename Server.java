@@ -5,14 +5,14 @@ import java.util.*;
 
 public class Server
 {
-	private ServerSocket serverSocket;
-	private Socket connection = null;
-	private Scanner input = null;
-	private Formatter output = null;
-	private String message = "";
+	private static ServerSocket serverSocket;
+	private static Socket connection = null;
 	
-	public void runServer()
+	public static void main(String[] args)
 	{
+		Scanner input = null;
+		Formatter output = null;
+		String message = "";
 		String response = "";
 		try
 		{
@@ -25,7 +25,8 @@ public class Server
 					connection = serverSocket.accept();
 
 					System.out.println("Client has connected");
-					processConnections();
+					input = new Scanner(connection.getInputStream());
+					output = new Formatter(connection.getOutputStream());
 
 					System.out.println("waiting for input");
 					while(true)
@@ -64,10 +65,5 @@ public class Server
 				ioe.printStackTrace();
 			}
 		}
-	}
-	public void processConnections() throws IOException
-	{
-		input = new Scanner(connection.getInputStream());
-		output = new Formatter(connection.getOutputStream());
 	}
 }
