@@ -1,69 +1,80 @@
-//Iris Osegueda
+//Iris Osegueda 
 import java.io.*;
-import java.net.*;
 import java.util.*;
+import java.net.*;
+import java.util.concurrent.*; 
 
-public class Server
+public class MultiServer 
 {
-	private static ServerSocket serverSocket;
-	private static Socket connection = null;
-	
-	public static void main(String[] args)
+	public static void main(String args[])
 	{
-		Scanner input = null;
-		Formatter output = null;
-		String message = "";
-		String response = "";
-		try
+		ServerSocket serverSocket;
+		Socket connection;
+		
+		try 
 		{
-			serverSocket = new ServerSocket(8000, 100);
-			while(true) 
+			serverSocket = new ServerSocket(8000);
+			
+			int clientNo = 1;
+			
+			ExecutorService threadExecutor = Executors.newCachedThreadPool();
+			while(true)
 			{
-				try
-				{
-					System.out.println("waiting for connection");
-					connection = serverSocket.accept();
-
-					System.out.println("Client has connected");
-					input = new Scanner(connection.getInputStream());
-					output = new Formatter(connection.getOutputStream());
-
-					System.out.println("waiting for input");
-					while(true)
-					{
-						message = input.next() + "\n";
-
-						System.out.println("Received message: " + message);
-						response = Integer.toString(message.length() - 1) + "\n";
-						System.out.println("Returning length: " + response);
-						
-						output.format(response);
-						output.flush();
-						System.out.println("Sent response" + "\n");
-					}
-				}
-				catch(IOException ioe)
-				{
-					ioe.printStackTrace();
-				}
+				connection = serverSocket.accept();
+				System.out.println("Started thread for client# " + clientNo);
+				
+				HandleAClient thread = new HandleAClient(connection, clientNo);
+				
+				threadExecutor.execute(thread);
+				
+				clientNo++;
 			}
 		}
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
-		finally
+	}
+}
+
+class HandleAClient implements Runnable
+{
+	Scanner input;
+	Formatter output;
+	Socket connection;
+	int clientNo;
+	String message = "";
+	String response = "";
+	
+	public HandleAClient(Socket connection, int clientNo)
+	{
+		this.connection = connection;
+		this.clientNo = clientNo;	
+	}
+	public void run()
+	{
+		try
 		{
-			try
+			System.out.println("waiting for input");
+			input = new Scanner(connection.getInputStream());
+			output = new Formatter(connection.getOutputStream());
+			
+			while(input.hasNext())
 			{
-				output.close();
-				input.close();
-				connection.close();
+				message = input.next() + "\n";
+
+				System.out.println("Received message: " + message);
+				response = Integer.toString(message.length() - 1) + "\n";
+				System.out.println("Returning length: " + response);
+				
+				output.format(response);
+				output.flush();
+				System.out.println("Sent response to client# " + clientNo + "\n");
 			}
-			catch(IOException ioe)
-			{
-				ioe.printStackTrace();
-			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
 		}
 	}
 }

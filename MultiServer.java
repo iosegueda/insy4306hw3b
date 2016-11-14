@@ -71,7 +71,6 @@ class HandleAClient implements Runnable
 				output.flush();
 				System.out.println("Sent response to client# " + clientNo + "\n");
 			}
-			//System.out.println("thread " + clientNo + " ended");
 		}
 		catch(IOException ioe)
 		{
